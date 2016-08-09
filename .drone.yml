@@ -1,0 +1,19 @@
+
+
+
+
+
+
+publish:
+  docker:
+    repo: stackdot/cuid-api
+    tag:
+      - '$${BRANCH/master/latest}'
+      - '$$BRANCH.$$BUILD_NUMBER'
+    registry: registry.hub.docker.com
+    username: $$DOCKERHUB_USER
+    password: $$DOCKERHUB_PASSWORD
+    email: qrpike@stackdot.com
+    storage_driver: overlay
+
+

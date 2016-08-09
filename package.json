@@ -1,0 +1,27 @@
+{
+  "name": "cuid-api",
+  "version": "1.0.0",
+  "description": "[![Build Status](https://drone.stackdot.com/api/badges/stackdot/cuid-api/status.svg)](https://drone.stackdot.com/stackdot/cuid-api) [![dependencies Status](https://david-dm.org/stackdot/cuid-api/status.svg)](https://david-dm.org/stackdot/cuid-api)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stackdot/cuid-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stackdot/cuid-api/issues"
+  },
+  "homepage": "https://github.com/stackdot/cuid-api#readme",
+  "dependencies": {
+    "async": "^2.0.1",
+    "dockerode": "^2.3.0",
+    "kue": "^0.11.1",
+    "lodash": "^4.14.2",
+    "q": "^1.4.1",
+    "restify": "^4.1.1"
+  }
+}
