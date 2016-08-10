@@ -6,4 +6,5 @@ WORKDIR /api
 # Copy App
 COPY . /api/
 
+
 CMD [ "npm", "start" ]
