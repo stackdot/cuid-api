@@ -112,7 +112,11 @@ module.exports = class Jobs extends Route {
 		}
 		// If we are updating nothing is required, since 
 		// we may only be senting 1 thing to update:
-		if(isUpdating) lodash.each( vals, ( val, key ) => vals[key].isRequired = false ) 
+		if(isUpdating){
+			lodash.each( vals, ( val, key ) => vals[key].isRequired = false ) 
+			// Update URLs need to have URL param ID defined
+			vals.id = { isRequired: true }
+		}
 		return vals
 	}
 
@@ -146,6 +150,7 @@ module.exports = class Jobs extends Route {
 		lodash.each( safeParams, ( value, param ) => req.job.set( param, value ) )
 		req.job.save(( err ) => {
 			if(err) return next( err )
+			this._events.emit( 'jobUpdated', req.job )
 			res.send( req.job )	
 		})
 	}

@@ -9,11 +9,13 @@ const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379'
 const DB = process.env.DB || 'mongodb://localhost/cuid'
 
 
+
 // Modules:
 const colors = require('colors')
 const kue = require('kue')
 const ui = require('kue-ui')
 const express = require('express')
+
 
 
 // Connect to mongodb:
@@ -38,6 +40,7 @@ app.use('/kue', ui.app)
 kue.app.listen(3000)
 
 
+
 // REST API Server:
 let server = require('restify-loader')({
 	dir: __dirname,
@@ -58,9 +61,11 @@ let server = require('restify-loader')({
 	mongoose: mongoose
 })
 
-// Start the Scheduler and Runner:
-// server.Runner = new server._dirs.libs.runner( server, queue )
-server.Scheduler = new server._dirs.libs.scheduler( server, queue )
+
+
+// Start the Scheduler and Listener:
+server.Listener = new server._dirs.libs.listener( server, queue, kue )
+server.Scheduler = new server._dirs.libs.scheduler( server, queue, kue )
 
 
 
