@@ -123,6 +123,7 @@ module.exports = class Jobs extends Route {
 		let Job = new this.schemas.job( req.params )
 		Job.save(( err ) => {
 			if(err) return next( err )
+			this._events.emit( 'newJob', Job )
 			res.send( Job )
 		})
 	}

@@ -20,7 +20,17 @@ module.exports = class Scheduler extends EventEmitter {
 		this.events = server._events
 		debug( '[new] scheduler'.good )
 		this.scheduleJobs()
+		this.listenToEvents()
 
+	}
+
+
+	listenToEvents(){
+		// Schedule job when a new one is created by the API:
+		this.events.on('newJob', ( job ) => {
+			console.log('New Job...')
+			this.scheduleJob( job )
+		})
 	}
 
 
@@ -44,14 +54,21 @@ module.exports = class Scheduler extends EventEmitter {
 
 	queueExecution( job ){
 		return () => {
-			console.log( 'job executed', job.name, this.crons )
-			let queueItem = this.queue.create('job', job)
-				.priority( job.priority )
-				.attempts( job.attempts )
-				.backoff({ type: 'exponential' })
-			if(job.ttl !== -1)
-				queueItem.ttl( job.ttl )
-			queueItem.save()
+
+			// Get the most up to date info before scheduling:
+			this.schemas.job.findOne({ _id: job._id }).exec(( err, job ) => {
+
+				if(err) return console.log( 'ERROR'.error, err )
+				debug( `Job ${job.name} Scheduled!`.good )
+				let queueItem = this.queue.create('job', job)
+					.priority( job.priority )
+					.attempts( job.attempts )
+					.backoff({ type: 'exponential' })
+				if(job.ttl !== -1)
+					queueItem.ttl( job.ttl )
+				queueItem.save()
+
+			})
 		}
 	}
 

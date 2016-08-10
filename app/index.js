@@ -35,7 +35,7 @@ ui.setup({
 })
 app.use('/api', kue.app)
 app.use('/kue', ui.app)
-
+kue.app.listen(3000)
 
 
 // REST API Server:
@@ -59,7 +59,7 @@ let server = require('restify-loader')({
 })
 
 // Start the Scheduler and Runner:
-server.Runner = new server._dirs.libs.runner( server, queue )
+// server.Runner = new server._dirs.libs.runner( server, queue )
 server.Scheduler = new server._dirs.libs.scheduler( server, queue )
 
 
