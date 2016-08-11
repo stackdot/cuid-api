@@ -31,14 +31,18 @@ module.exports = class Scheduler extends EventEmitter {
 		// Schedule job when a new one is created by the API:
 		this.events.on( 'newJob', ( job ) => {
 			debug( `New Job: ${job.name}` )
-			this.scheduleJob( job )
+			if( job.enabled ){
+				this.scheduleJob( job )
+			}
 		})
 		// Remove current CRON and create new one when Job is updated:
 		this.events.on( 'jobUpdated', ( job ) => {
 			debug( `Job Updated: ${job.name}` )
 			this.crons[ job._id ].stop()
 			this.crons[ job._id ] = null
-			this.scheduleJob( job )
+			if(job.enabled){
+				this.scheduleJob( job )
+			}
 		})
 	}
 

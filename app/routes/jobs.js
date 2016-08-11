@@ -35,19 +35,6 @@ module.exports = class Jobs extends Route {
 		}, this.getJobs.bind( this ))
 
 
-		// Get single job:
-		this.server.get({
-			url: '/v1/jobs/:id',
-			validation: {
-				resources: {
-					id: {
-						isRequired: true
-					}
-				}
-			}
-		}, this.middleware.jobs.getJob( self.schemas ), this.getJob.bind( this ))
-
-
 		// Create new job:
 		this.server.post({
 			url: '/v1/jobs',
@@ -66,6 +53,110 @@ module.exports = class Jobs extends Route {
 		}, this.middleware.jobs.getJob( self.schemas ), this.updateJob.bind( this ))
 
 
+		// Get single job:
+		this.server.get({
+			url: '/v1/jobs/:id',
+			validation: {
+				resources: {
+					id: { isRequired: true }
+				}
+			}
+		}, this.middleware.jobs.getJob( self.schemas ), this.getJob.bind( this ))
+
+
+		// Get single job:
+		this.server.get({
+			url: '/v1/jobs/:id/history',
+			validation: {
+				resources: {
+					id: { isRequired: true },
+					limit: {
+						isRequired: false,
+						isNumeric: true,
+						min: 1,
+						max: 100
+					},
+					offset: {
+						isRequired: false,
+						isNumeric: true,
+						min: 0,
+						max: 1000
+					}
+				}
+			}
+		}, this.middleware.jobs.getJob( self.schemas ), this.getJobHistory.bind( this ))
+
+
+	}
+
+
+	// Create a new job:
+	// TODO: Add new job to the CRON scheduler
+	postJob( req, res, next ){
+		let Job = new this.schemas.job( req.params )
+		Job.save(( err ) => {
+			if(err) return next( err )
+			this._events.emit( 'newJob', Job )
+			res.send( Job )
+		})
+	}
+
+
+	// Update a job:
+	// TODO: Update the CRON scheduler cron
+	updateJob( req, res, next ){
+		let safeParams = lodash.pick( req.params, [
+			'name',
+			'description',
+			'enabled',
+			'cron',
+			'environment_vars',
+			'meta',
+			'priority',
+			'ttl',
+			'attempts'
+		])
+		lodash.each( safeParams, ( value, param ) => req.job.set( param, value ) )
+		req.job.save(( err ) => {
+			if(err) return next( err )
+			this._events.emit( 'jobUpdated', req.job )
+			res.send( req.job )	
+		})
+	}
+
+
+	// Get all jobs:
+	getJobs( req, res, next ) {
+		req.params.offset = req.params.offset || 0
+		req.params.limit = req.params.limit || 50
+		let search = this.schemas.job.find({})
+			.skip( req.params.offset )
+			.limit( req.params.limit )
+
+		search.exec(( err, job ) => {
+			if( err ) return next( err )
+			res.send( job )
+		})
+	}
+
+
+	getJobHistory( req, res, next ){
+		req.params.offset = req.params.offset || 0
+		req.params.limit = req.params.limit || 50
+		let query = this.schemas.history.find({ job: req.params.id }).sort('-created')
+			.limit( req.params.limit )
+			.skip( req.params.offset )
+
+		query.exec(( err, histories ) => {
+			if( err ) return next( err )
+			res.send( histories )
+		})
+	}
+
+
+	// Get a specific job:
+	getJob( req, res, next ){
+		res.send( req.job )
 	}
 
 
@@ -120,60 +211,6 @@ module.exports = class Jobs extends Route {
 		return vals
 	}
 
-
-	// Create a new job:
-	// TODO: Add new job to the CRON scheduler
-	postJob( req, res, next ){
-		let Job = new this.schemas.job( req.params )
-		Job.save(( err ) => {
-			if(err) return next( err )
-			this._events.emit( 'newJob', Job )
-			res.send( Job )
-		})
-	}
-
-
-	// Update a job:
-	// TODO: Update the CRON scheduler cron
-	updateJob( req, res, next ){
-		let safeParams = lodash.pick( req.params, [
-			'name',
-			'description',
-			'enabled',
-			'cron',
-			'environment_vars',
-			'meta',
-			'priority',
-			'ttl',
-			'attempts'
-		])
-		lodash.each( safeParams, ( value, param ) => req.job.set( param, value ) )
-		req.job.save(( err ) => {
-			if(err) return next( err )
-			this._events.emit( 'jobUpdated', req.job )
-			res.send( req.job )	
-		})
-	}
-
-
-	// Get all jobs:
-	getJobs( req, res, next ) {
-		let search = this.schemas.job.find({})
-		if(req.params.offset)
-			search.offset( req.params.offset )
-		if(req.params.limit)
-			search.limit( req.params.limit )
-		search.exec(( err, job ) => {
-			if( err ) return next( err )
-			res.send( job )
-		})
-	}
-
-
-	// Get a specific job:
-	getJob( req, res, next ){
-		res.send( req.job )
-	}
 
 }
 
