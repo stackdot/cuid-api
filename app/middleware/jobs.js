@@ -10,6 +10,21 @@ module.exports = {
 				next()
 			})
 		}
+	},
+
+
+	getHistory( schemas, param = 'historyId', selectLogs = false ){
+		return ( req, res, next ) => {
+			let query = schemas.history.findOne({ _id: req.params[ param ] })
+			if( selectLogs == true )
+				query = query.select('+logs')
+			query.exec(( err, history ) => {
+				if(err) return next( err )
+				req.history = history
+				next()
+			})
+		}
 	}
+
 
 }

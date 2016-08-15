@@ -1,5 +1,5 @@
 
-'use strict';
+'use strict'
 
 const Route = require('restify-loader/route')
 const lodash = require('lodash')
@@ -15,7 +15,7 @@ module.exports = class Jobs extends Route {
 	addListeners(){
 
 		let self = this
-		this.debug('added listeners'.info);
+		this.debug('added listeners'.info)
 
 		// Get all jobs:
 		this.server.get({
@@ -87,6 +87,31 @@ module.exports = class Jobs extends Route {
 		}, this.middleware.jobs.getJob( self.schemas ), this.getJobHistory.bind( this ))
 
 
+		// Get single job:
+		this.server.get({
+			url: '/v1/jobs/:id/history/:historyId',
+			validation: {
+				resources: {
+					id: { isRequired: true },
+					limit: {
+						isRequired: false,
+						isNumeric: true,
+						min: 1,
+						max: 100
+					},
+					offset: {
+						isRequired: false,
+						isNumeric: true,
+						min: 0,
+						max: 1000
+					}
+				}
+			}
+		},
+			this.middleware.jobs.getJob( self.schemas ),
+			this.middleware.jobs.getHistory( self.schemas, 'historyId', true ),
+			this.getHistory.bind( this ))
+
 	}
 
 
@@ -99,6 +124,11 @@ module.exports = class Jobs extends Route {
 			this._events.emit( 'newJob', Job )
 			res.send( Job )
 		})
+	}
+
+
+	getHistory( req, res, next ){
+		res.send( req.history )
 	}
 
 

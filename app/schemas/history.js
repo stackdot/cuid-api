@@ -16,7 +16,10 @@ module.exports = mongoose.model('History', new Schema({
 		unique: true,
 		required: true
 	},
-	logs: [],
+	logs: {
+		type: Array,
+		select: false
+	},
 	data: {},
 	meta: {},
 	state: String,
