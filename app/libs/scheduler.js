@@ -44,6 +44,12 @@ module.exports = class Scheduler extends EventEmitter {
 				this.scheduleJob( job )
 			}
 		})
+		// Job deleted
+		this.events.on( 'jobDeleted', ( job ) => {
+			debug( `Job Deleted: ${job.name}` )
+			this.crons[ job._id ].stop()
+			this.crons[ job._id ] = null
+		})
 	}
 
 

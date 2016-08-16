@@ -63,6 +63,7 @@ module.exports = class Jobs extends Route {
 			}
 		}, this.middleware.jobs.getJob( self.schemas ), this.getJob.bind( this ))
 
+
 		// Get single job:
 		this.server.del({
 			url: '/v1/jobs/:id',
@@ -137,6 +138,7 @@ module.exports = class Jobs extends Route {
 	}
 
 
+	// Get job history
 	getHistory( req, res, next ){
 		res.send( req.history )
 	}
@@ -180,6 +182,7 @@ module.exports = class Jobs extends Route {
 	}
 
 
+	// Get specific history Item by ID, with logs selected:
 	getJobHistory( req, res, next ){
 		req.params.offset = req.params.offset || 0
 		req.params.limit = req.params.limit || 50
@@ -194,13 +197,14 @@ module.exports = class Jobs extends Route {
 	}
 
 
-
+	// Delete a job:
 	deleteJob( req, res, next ){
 		console.log('delete job', req.job._id)
 		req.job.remove(( err ) => {
 			console.log('done', err)
 			if( err ) return next( err )
 			res.send( 200 )
+			this._events.emit( 'jobDeleted', req.job )
 		})
 	}
 
