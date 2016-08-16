@@ -62,7 +62,7 @@ module.exports = class Scheduler extends EventEmitter {
 		if( !lodash.isEmpty( this.crons[job._id] ) ){
 			return debug( `CRON already scheduled for ${job._id} ( ${job.name} )` )
 		}
-		// this.crons[ job._id ] = new CronJob( job.cron, this.queueExecution( job ), true, job.timezone )
+		this.crons[ job._id ] = new CronJob( job.cron, this.queueExecution( job ), true, job.timezone )
 	}
 
 	queueExecution( job ){

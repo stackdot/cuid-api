@@ -63,6 +63,16 @@ module.exports = class Jobs extends Route {
 			}
 		}, this.middleware.jobs.getJob( self.schemas ), this.getJob.bind( this ))
 
+		// Get single job:
+		this.server.del({
+			url: '/v1/jobs/:id',
+			validation: {
+				resources: {
+					id: { isRequired: true }
+				}
+			}
+		}, this.middleware.jobs.getJob( self.schemas ), this.deleteJob.bind( this ))
+
 
 		// Get single job:
 		this.server.get({
@@ -121,8 +131,8 @@ module.exports = class Jobs extends Route {
 		let Job = new this.schemas.job( req.params )
 		Job.save(( err ) => {
 			if(err) return next( err )
-			this._events.emit( 'newJob', Job )
 			res.send( Job )
+			this._events.emit( 'newJob', Job )
 		})
 	}
 
@@ -149,8 +159,8 @@ module.exports = class Jobs extends Route {
 		lodash.each( safeParams, ( value, param ) => req.job.set( param, value ) )
 		req.job.save(( err ) => {
 			if(err) return next( err )
-			this._events.emit( 'jobUpdated', req.job )
 			res.send( req.job )	
+			this._events.emit( 'jobUpdated', req.job )
 		})
 	}
 
@@ -180,6 +190,17 @@ module.exports = class Jobs extends Route {
 		query.exec(( err, histories ) => {
 			if( err ) return next( err )
 			res.send( histories )
+		})
+	}
+
+
+
+	deleteJob( req, res, next ){
+		console.log('delete job', req.job._id)
+		req.job.remove(( err ) => {
+			console.log('done', err)
+			if( err ) return next( err )
+			res.send( 200 )
 		})
 	}
 

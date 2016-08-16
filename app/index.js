@@ -1,6 +1,8 @@
 'use strict'
 
-
+/*
+ Consider maybe using https://github.com/node-schedule/node-schedule instead of CRON
+ */
 
 // Settings:
 const PORT = process.env.PORT || 8080
