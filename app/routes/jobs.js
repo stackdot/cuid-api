@@ -198,6 +198,7 @@ module.exports = class Jobs extends Route {
 
 
 	// Delete a job:
+	// TODO: Delete it's history, logs, etc.
 	deleteJob( req, res, next ){
 		console.log('delete job', req.job._id)
 		req.job.remove(( err ) => {
@@ -250,7 +251,7 @@ module.exports = class Jobs extends Route {
 			},
 			enabled: {
 				isRequired: false,
-				isBoolean: true
+				// isBoolean: true
 			},
 			meta: {
 				isRequired: false
